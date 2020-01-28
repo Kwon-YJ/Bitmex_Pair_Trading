@@ -3,61 +3,48 @@ import csv
 import datetime
 import ccxt
 
-bitmex = ccxt.bitmex()
-#markets = bitmex.fetch_tickers()
+#bitmex = ccxt.bitmex()
 
-basis = []
-
-
-def calculate(ticker1, ticker2, time_):
-    time.sleep(5.01)
-    ticker1_ohlcvs = bitmex.fetch_ohlcv(ticker1, "1h",bitmex.parse8601(time_))
-    ticker2_ohlcvs = bitmex.fetch_ohlcv(ticker2, "1h", bitmex.parse8601(time_))
-    for i in range(0,len(ticker1_ohlcvs)):
-        basis.append(str(datetime.datetime.fromtimestamp(ticker1_ohlcvs[i][0]/1000)))
-        basis.append(ticker2_ohlcvs[i][1]/ticker1_ohlcvs[i][1])
-        basis.append(ticker2_ohlcvs[i][2]/ticker1_ohlcvs[i][2])
-        basis.append(ticker2_ohlcvs[i][3]/ticker1_ohlcvs[i][3])
-        basis.append(ticker2_ohlcvs[i][4]/ticker1_ohlcvs[i][4])
-        timestamp = ticker2_ohlcvs[-1][0]
-        datetimeobj = str(datetime.datetime.fromtimestamp(timestamp/1000))
-        nexttime = datetimeobj[0:10] + 'T' + datetimeobj[11:19]
-    try:
-        time.sleep(5.01)
-        calculate(ticker1, ticker2, nexttime)
-    except:
-        print(" ")
-
-start = '2019-12-13T17:45:00'
-#start = '2020-01-10T00:00:00'
-
-a = start[0:10]+" " + start[11:19]
-convert_date = str((datetime.datetime.strptime(a, "%Y-%m-%d %H:%M:%S")).timestamp())
-now =str(datetime.datetime.now().timestamp())
-now_ = str(datetime.datetime.now() + datetime.timedelta(hours = 9))
-remaining =str(int((float(now) - float(convert_date))/72000))
-print("현재시간" +"["+now_[11:16]+"]")
-print("소요시간 최소" + remaining + "분")
+bitmex = ccxt.bitmex({
+    'apiKey': 'CfIk1cU00oyHEF8HTy7njTXm',
+    'secret': '2tVApaQnFwe7Bh-A4lZk-tmKQj9ixoYMgZM4Lpjsk1_zGi0Z',
+})
 
 
-calculate('BTC/USD', 'XBTM20', start)
+if 'test' in bitmex.urls:
+    bitmex.urls['api'] = bitmex.urls['test'] # ←----- switch the base URL to testnet
+#print(bitmex.fetch_balance())
+
+#start = '2020-01-20T00:00:00'
+
+timestamp = datetime.datetime.now().timestamp()
+datetimeobj = str(datetime.datetime.fromtimestamp(timestamp*0.99995))
+start = datetimeobj[0:10] + 'T' + datetimeobj[11:19]
 
 
-f = open('result.csv','w',encoding="euc-kr",newline='')
+#print(start)
 
-wr = csv.writer(f)
 
-try:
-	i = 0
-	while(len(basis)):
-		if i ==0:
-			wr.writerow(["time", "Open", "High", "low", "Close"])
-		wr.writerow([basis[i], basis[i+1], basis[i+2], basis[i+3], basis[i+4]])
-		i = i+5
-except:
-	print("프로그램 실행 완료")
-f.close()
+XBT_ohlcv = bitmex.fetch_ohlcv('BTC/USD', "1h",bitmex.parse8601(start))
 
+
+
+
+XBT6M_ohlcv = bitmex.fetch_ohlcv('XBTM20', "1h",bitmex.parse8601(start))
+
+#print(XBT_ohlcv)
+
+#print(XBT6M_ohlcv)
+
+#max_data = 1.04521650993862
+#min_data = 1.00661278471711
+
+max_data = 1.27373960796277
+min_data = 0.953225806451612
+
+#print((float(XBT6M_ohlcv[-1][4]) / float(XBT_ohlcv[-1][4])))
+
+print((((float(XBT6M_ohlcv[-1][4]) / float(XBT_ohlcv[-1][4])) - min_data) / (max_data - min_data)))
 
 
 

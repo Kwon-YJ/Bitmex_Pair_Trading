@@ -17,7 +17,7 @@ buffer_1 = [] #BTCUSD
 buffer_2 = [] #XBTM20
 buffer_3 = [] #big, small
 
-max_data = 1.04521650993862
+max_data = 1.06556981569043
 min_data = 1.00661278471711
 
 Input_money = 0.46 * (bitmex.fetch_balance()['BTC']['free']) 
